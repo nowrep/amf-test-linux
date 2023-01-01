@@ -1,8 +1,8 @@
-#include <AMF/core/Factory.h>
-#include <AMF/core/Trace.h>
-#include <AMF/components/VideoEncoderVCE.h>
-#include <AMF/components/VideoEncoderHEVC.h>
-#include <AMF/components/VideoEncoderAV1.h>
+#include "AMF/core/Factory.h"
+#include "AMF/core/Trace.h"
+#include "AMF/components/VideoEncoderVCE.h"
+#include "AMF/components/VideoEncoderHEVC.h"
+#include "AMF/components/VideoEncoderAV1.h"
 
 #include <dlfcn.h>
 #include <vulkan/vulkan.hpp>
