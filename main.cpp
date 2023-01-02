@@ -13,14 +13,13 @@
 using namespace amf;
 
 struct adapter_caps {
-	bool is_amd = false;
 	bool supports_avc = false;
 	bool supports_hevc = false;
 	bool supports_av1 = false;
 };
 
 static AMFFactory *amf_factory = nullptr;
-static std::map<uint32_t, adapter_caps> adapter_info;
+static adapter_caps adapter_info;
 
 static bool has_encoder(AMFContextPtr &amf_context, const wchar_t *encoder_name)
 {
@@ -34,8 +33,6 @@ static bool get_adapter_caps(uint32_t adapter_idx)
 {
 	if (adapter_idx)
 		return false;
-
-	adapter_caps &caps = adapter_info[adapter_idx];
 
 	AMF_RESULT res;
 	AMFContextPtr amf_context;
@@ -53,10 +50,9 @@ static bool get_adapter_caps(uint32_t adapter_idx)
 	if (res != AMF_OK)
 		return false;
 
-	caps.is_amd = true;
-	caps.supports_avc = has_encoder(amf_context, AMFVideoEncoderVCE_AVC);
-	caps.supports_hevc = has_encoder(amf_context, AMFVideoEncoder_HEVC);
-	caps.supports_av1 = has_encoder(amf_context, AMFVideoEncoder_AV1);
+	adapter_info.supports_avc = has_encoder(amf_context, AMFVideoEncoderVCE_AVC);
+	adapter_info.supports_hevc = has_encoder(amf_context, AMFVideoEncoder_HEVC);
+	adapter_info.supports_av1 = has_encoder(amf_context, AMFVideoEncoder_AV1);
 
 	return true;
 }
@@ -122,19 +118,17 @@ try {
 	while (get_adapter_caps(idx++))
 		;
 
-	for (auto &[idx, caps] : adapter_info) {
-		printf("[%u]\n", idx);
-		printf("is_amd=%s\n", caps.is_amd ? "true" : "false");
-		printf("supports_avc=%s\n",
-		       caps.supports_avc ? "true" : "false");
-		printf("supports_hevc=%s\n",
-		       caps.supports_hevc ? "true" : "false");
-		printf("supports_av1=%s\n",
-		       caps.supports_av1 ? "true" : "false");
-	}
+	printf("\n----------------------------------------------------------------\n\n");
+	printf("AMF Encoders\n\n");
+	printf("AVC (H264)    = %s\n",
+	       adapter_info.supports_avc ? "True" : "False");
+	printf("HEVC (H265)   = %s\n",
+	       adapter_info.supports_hevc ? "True" : "False");
+	printf("AV1           = %s\n",
+	       adapter_info.supports_av1 ? "True" : "False");
 
 	return 0;
 } catch (const char *text) {
-	printf("[error]\nstring=%s\n", text);
+	printf("ERROR: %s\n", text);
 	return 0;
 }
